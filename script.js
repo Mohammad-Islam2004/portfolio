@@ -413,54 +413,86 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // 13. PREMIUM 3D SLIDER
-  const slides = document.querySelectorAll(".slide")
-  const prevBtn = document.getElementById("prevSlide")
-  const nextBtn = document.getElementById("nextSlide")
-  let currentSlide = 0
-  let slideInterval
+const slides = document.querySelectorAll(".slide");
+const prevBtn = document.getElementById("prevSlide");
+const nextBtn = document.getElementById("nextSlide");
+const sliderContainer = document.querySelector(".slider-container"); // Select slider wrapper
 
-  function showSlide(index) {
-    if (!slides.length) return
-    slides.forEach(function (slide) {
-      slide.classList.remove("active")
-    })
-    currentSlide = index
-    if (currentSlide >= slides.length) currentSlide = 0
-    if (currentSlide < 0) currentSlide = slides.length - 1
-    slides[currentSlide].classList.add("active")
+let currentSlide = 0;
+let slideInterval = null;
+const SLIDE_DURATION = 2500; // Define interval duration cleanly in one place
+
+function showSlide(index) {
+  if (!slides.length) return;
+
+  // Calculate wrapped index directly
+  if (index >= slides.length) {
+    currentSlide = 0;
+  } else if (index < 0) {
+    currentSlide = slides.length - 1;
+  } else {
+    currentSlide = index;
   }
 
-  function nextSlideFn() {
-    showSlide(currentSlide + 1)
-  }
-
-  if (nextBtn && prevBtn) {
-    nextBtn.addEventListener("click", function () {
-      nextSlideFn()
-      resetSliderTimer()
-    })
-    prevBtn.addEventListener("click", function () {
-      showSlide(currentSlide - 1)
-      resetSliderTimer()
-    })
-  }
-
-  function startSliderTimer() {
-    slideInterval = setInterval(nextSlideFn, 6000)
-  }
-  function resetSliderTimer() {
-    clearInterval(slideInterval)
-    startSliderTimer()
-  }
-  startSliderTimer()
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden) {
-      clearInterval(slideInterval)
+  slides.forEach(function (slide, idx) {
+    if (idx === currentSlide) {
+      slide.classList.add("active");
     } else {
-      startSliderTimer()
+      slide.classList.remove("active");
     }
-  })
+  });
+}
+
+function nextSlideFn() {
+  showSlide(currentSlide + 1);
+}
+
+if (nextBtn && prevBtn) {
+  nextBtn.addEventListener("click", function () {
+    nextSlideFn();
+    resetSliderTimer();
+  });
+
+  prevBtn.addEventListener("click", function () {
+    showSlide(currentSlide - 1);
+    resetSliderTimer();
+  });
+}
+
+function startSliderTimer() {
+  if (slideInterval) clearInterval(slideInterval); // Prevent duplicate timers running concurrently
+  slideInterval = setInterval(nextSlideFn, SLIDE_DURATION);
+}
+
+function stopSliderTimer() {
+  if (slideInterval) {
+    clearInterval(slideInterval);
+    slideInterval = null;
+  }
+}
+
+function resetSliderTimer() {
+  stopSliderTimer();
+  startSliderTimer();
+}
+
+// Pause autoplay when hovering over the slider container
+if (sliderContainer) {
+  sliderContainer.addEventListener("mouseenter", stopSliderTimer);
+  sliderContainer.addEventListener("mouseleave", startSliderTimer);
+}
+
+// Handle tab visibility changes
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) {
+    stopSliderTimer();
+  } else {
+    startSliderTimer();
+  }
+});
+
+// Initial launch
+startSliderTimer();
 
   // 14. GLOW CARDS TILT LOGIC
   const cards = document.querySelectorAll(

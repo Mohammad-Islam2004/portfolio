@@ -1859,7 +1859,7 @@ section {
     gap: 0.8rem;
     padding: 1rem 1.2rem;
     border-radius: 16px;
-    width: 230px;
+    width: 200px;
     height: 68px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2505,7 +2505,7 @@ section {
     filter: blur(0);
     transform: scale(1) rotateY(0deg);
     z-index: 2;
-    position: relative;
+    position: absolute;
 }
 
 .slide img {
